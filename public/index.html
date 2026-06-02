@@ -49,6 +49,16 @@
             placeholder='{"sequence": "ATGC...", "analysis": "variant_calling"}'
           ></textarea>
 
+          <section class="upload-box" aria-label="HPC file upload">
+            <label for="uploadFileInput">Upload file to HPC shared storage</label>
+            <input id="uploadFileInput" type="file" />
+
+            <label for="uploadSubdirInput">Optional upload subdirectory</label>
+            <input id="uploadSubdirInput" type="text" placeholder="fastqc-runs" />
+
+            <button id="uploadButton" type="button">Upload To HPC</button>
+          </section>
+
           <button id="sendButton" type="submit">Send</button>
         </form>
       </section>

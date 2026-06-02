@@ -2,6 +2,7 @@ require("dotenv").config();
 
 const express = require("express");
 const { getHealth, processChatRequest } = require("./lib/chatService");
+const { handleUploadRequest } = require("./lib/uploadProxy");
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -34,6 +35,10 @@ app.post("/api/chat", async (req, res) => {
       details: error.message
     });
   }
+});
+
+app.post("/api/upload", async (req, res) => {
+  return handleUploadRequest(req, res);
 });
 
 app.listen(port, () => {

@@ -72,6 +72,21 @@ Vercel uses:
 
 After deploy, your app works at the Vercel domain with the same frontend and `/api/*` endpoints.
 
+## Connect To HPC (SSH + SLURM)
+
+For HPC integration, run the bridge service in `bridge-server/` on a machine that can SSH to your cluster login node.
+
+Quick start:
+
+1. `cd bridge-server`
+2. `npm install`
+3. `cp .env.example .env`
+4. Set `HPC_SSH_TARGET` and `HPC_ANALYSIS_COMMAND`
+5. `npm run dev`
+6. Set app `BIO_SERVER_URL` to the bridge URL
+
+Detailed setup is documented in `bridge-server/README.md`.
+
 ## API Endpoints
 
 - `GET /api/health`
@@ -93,6 +108,10 @@ After deploy, your app works at the Vercel domain with the same frontend and `/a
 	- Response includes:
 		- assistant `reply`
 		- bio server `result` or `error`
+
+- `POST /api/upload`
+	- Uploads a local file from the web UI to your configured bio bridge server.
+	- Intended for FASTQ and similar pipeline inputs.
 
 ## Notes About Hack Server
 

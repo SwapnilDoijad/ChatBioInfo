@@ -6,6 +6,9 @@ const sampleDataInputEl = document.getElementById("sampleDataInput");
 const bioToggleEl = document.getElementById("bioToggle");
 const statusPillEl = document.getElementById("statusPill");
 const integrationHintEl = document.getElementById("integrationHint");
+const uploadFileInputEl = document.getElementById("uploadFileInput");
+const uploadSubdirInputEl = document.getElementById("uploadSubdirInput");
+const uploadButtonEl = document.getElementById("uploadButton");
 
 let isBioConfigured = false;
 
@@ -17,6 +20,59 @@ function addMessage(role, text) {
   messagesEl.scrollTop = messagesEl.scrollHeight;
 }
 
+function updateUploadControls(isEnabled) {
+  uploadFileInputEl.disabled = !isEnabled;
+  uploadSubdirInputEl.disabled = !isEnabled;
+  uploadButtonEl.disabled = !isEnabled;
+}
+
+uploadButtonEl.addEventListener("click", async () => {
+  const file = uploadFileInputEl.files?.[0];
+
+  if (!file) {
+    addMessage("meta", "Select a file first, then click Upload To HPC.");
+    return;
+  }
+
+  uploadButtonEl.disabled = true;
+
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const targetSubdir = uploadSubdirInputEl.value.trim();
+    if (targetSubdir) {
+      formData.append("targetSubdir", targetSubdir);
+    }
+
+    const response = await fetch("/api/upload", {
+      method: "POST",
+      body: formData
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || data.details || "Upload failed");
+    }
+
+    const currentSampleData = parseSampleData(sampleDataInputEl.value);
+    const nextSampleData =
+      currentSampleData && typeof currentSampleData === "object" && !Array.isArray(currentSampleData)
+        ? currentSampleData
+        : {};
+
+    nextSampleData.fastqPath = data.remotePath;
+    nextSampleData.originalFileName = data.fileName;
+
+    sampleDataInputEl.value = JSON.stringify(nextSampleData, null, 2);
+    addMessage("meta", `Uploaded to HPC: ${data.remotePath}`);
+  } catch (error) {
+    addMessage("meta", `Upload failed: ${error.message}`);
+  } finally {
+    uploadButtonEl.disabled = !isBioConfigured;
+  }
+});
 async function checkHealth() {
   try {
     const response = await fetch("/api/health");
@@ -30,11 +86,13 @@ async function checkHealth() {
       bioToggleEl.checked = false;
       bioToggleEl.disabled = true;
       sampleDataInputEl.disabled = true;
+      updateUploadControls(false);
       integrationHintEl.textContent =
         "Chat mode is active. Add BIO_SERVER_URL later to unlock bioanalysis.";
     } else {
       bioToggleEl.disabled = false;
       sampleDataInputEl.disabled = false;
+      updateUploadControls(true);
       integrationHintEl.textContent =
         "Bio mode is enabled. Toggle analysis on any message when needed.";
     }
@@ -46,6 +104,7 @@ async function checkHealth() {
   } catch {
     statusPillEl.textContent = "Server unreachable";
     statusPillEl.classList.add("error");
+    updateUploadControls(false);
     integrationHintEl.textContent = "Could not reach server. Start the app and refresh.";
   }
 }
