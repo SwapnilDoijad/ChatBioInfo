@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ChatBioInfo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="chat-panel">
+        <header class="chat-header">
+          <div>
+            <h1>ChatBioInfo</h1>
+            <p>ChatGPT + Bioinformatics Analysis Pipeline</p>
+            <p id="integrationHint" class="integration-hint">Chat mode is ready. Bio mode can be enabled later.</p>
+          </div>
+          <span id="statusPill" class="status-pill">Checking...</span>
+        </header>
+
+        <div id="messages" class="messages" aria-live="polite"></div>
+
+        <form id="chatForm" class="chat-form">
+          <label for="messageInput">Message</label>
+          <textarea
+            id="messageInput"
+            name="message"
+            rows="3"
+            placeholder="Ask a question or request bioinformatics insights..."
+            required
+          ></textarea>
+
+          <label class="switch-row" for="bioToggle">
+            <input id="bioToggle" type="checkbox" />
+            <span>Run bioanalysis on hack server for this message</span>
+          </label>
+
+          <label for="sampleDataInput">Optional sample data (JSON or plain text)</label>
+          <textarea
+            id="sampleDataInput"
+            name="sampleData"
+            rows="3"
+            placeholder='{"sequence": "ATGC...", "analysis": "variant_calling"}'
+          ></textarea>
+
+          <button id="sendButton" type="submit">Send</button>
+        </form>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
